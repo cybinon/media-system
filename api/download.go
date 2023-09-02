@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
@@ -11,18 +12,19 @@ import (
 )
 
 func handlerDownload(w http.ResponseWriter, r *http.Request) {
-
 	// We get the name of the file on the URL
-	key := r.URL.Query().Get("key")
-	prevFile, err := os.Open("../tmp/" + key)
+	key := strings.ReplaceAll(r.URL.Path, "/read/", "")
+	locationPath := "../tmp/" + key
+	print()
+	prevFile, err := os.Open(locationPath)
 	if err == nil {
 		defer prevFile.Close()
-		http.ServeFile(w, r, key)
+		http.ServeFile(w, r, locationPath)
 		return
 	}
-	print("gone")
+
 	// Create the file
-	newFile, err := os.Create("../tmp/" + key)
+	newFile, err := os.Create(locationPath)
 	if err != nil {
 		print(err.Error())
 		showError(w, r, http.StatusBadRequest, "Something went wrong creating the local file")
@@ -36,9 +38,11 @@ func handlerDownload(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
+		println(err.Error())
+		os.Remove(locationPath)
 		showError(w, r, http.StatusBadRequest, "Something went wrong retrieving the file from S3")
 		return
 	}
 
-	http.ServeFile(w, r, "../tmp/"+key)
+	http.ServeFile(w, r, locationPath)
 }

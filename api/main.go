@@ -23,9 +23,10 @@ func main() {
 
 	os.Mkdir("../tmp", os.FileMode(0777))
 
-	http.HandleFunc("/upload", handlerUpload)     // Upload: /upload (upload file named "file")
-	http.HandleFunc("/download", handlerDownload) // Download: /download?key={key of the object}&filename={name for the new file}
-	// http.HandleFunc("/list", handlerList)         // List: /list?prefix={prefix}&delimeter={delimeter}
+	http.HandleFunc("/upload", handlerUpload) // Upload: /upload (upload file named "file")
+	http.HandleFunc("/read/", handlerDownload)
+	http.HandleFunc("/list", handlerList) // List: /list?prefix={prefix}&delimeter={delimeter}
+
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
