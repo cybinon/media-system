@@ -1,4 +1,4 @@
-FROM golang:1.20
+FROM golang:1.20 as builder
 
 WORKDIR /app
 
@@ -9,6 +9,10 @@ RUN go mod download
 COPY *.go ./
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o ./server
-EXPOSE 8080
 
+FROM alpine
+WORKDIR /app
+
+COPY --from=builder /app/server ./
+EXPOSE 8080
 CMD ["./server"]
