@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
@@ -22,12 +23,12 @@ func handlerUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	filename := header.Filename
+	filename := fmt.Sprint(time.Now().UnixNano()/1e12) + "-" + header.Filename
 
 	uploader := manager.NewUploader(awsS3Client)
 	_, err = uploader.Upload(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(AWS_S3_BUCKET),
-		Key:    aws.String(filename),
+		Key:    aws.String("auto/" + filename),
 		Body:   file,
 	})
 	if err != nil {
@@ -36,6 +37,7 @@ func handlerUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "Successfully uploaded to %q\n", AWS_S3_BUCKET)
+	w.Header().Add("Content-Type", "application/json")
+	fmt.Fprintf(w, `{"filename": "%s"}`, filename)
 
 }

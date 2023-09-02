@@ -15,7 +15,7 @@ func handlerDownload(w http.ResponseWriter, r *http.Request) {
 	// We get the name of the file on the URL
 	key := strings.ReplaceAll(r.URL.Path, "/read/", "")
 	locationPath := "../tmp/" + key
-	print()
+
 	prevFile, err := os.Open(locationPath)
 	if err == nil {
 		defer prevFile.Close()
@@ -34,7 +34,7 @@ func handlerDownload(w http.ResponseWriter, r *http.Request) {
 	downloader := manager.NewDownloader(awsS3Client)
 	_, err = downloader.Download(context.TODO(), newFile, &s3.GetObjectInput{
 		Bucket: aws.String(AWS_S3_BUCKET),
-		Key:    aws.String(key),
+		Key:    aws.String("auto/" + key),
 	})
 
 	if err != nil {
