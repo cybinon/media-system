@@ -12,7 +12,7 @@ import (
 
 const (
 	AWS_S3_REGION = "ap-east-1" // Region
-	AWS_S3_BUCKET = "cybinon"   // Bucket
+	AWS_S3_BUCKET = "mirox"     // Bucket
 )
 
 // We will be using this client everywhere in our code
